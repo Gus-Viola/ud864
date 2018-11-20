@@ -29,6 +29,13 @@ API Course, Lesson 1 -->
          map: map,
          title: "My First Marker"
        });
+       const infowindow = new google.maps.InfoWindow({
+         content: "InfoWindow, flowing through the wind..." +
+         " Shall we start over?"
+       })
+       marker.addListener('click', ()=> {
+         infowindow.open(map, marker)
+       })
      }
    </script>
 
