@@ -13,7 +13,7 @@ API Course, Lesson 1 -->
    }
 
    .container {
-     height: 100%;
+     height: 97%;
      position: relative;
    }
 
@@ -68,12 +68,30 @@ API Course, Lesson 1 -->
      // TODO: Create a map variable
      let map;
      let markers = [];
+     const styles = [
+    {
+        "stylers": [
+            {
+                "saturation": 85
+            },
+            {
+                "gamma": 0.6
+            }
+            // ,{
+            //   "hue": 	"#008080"
+            // }
+
+        ]
+    }
+]
 
      // TODO: Complete the following function to initialize the map
      function initMap() {
        map = new google.maps.Map(document.getElementById('map'), {
          center: {lat: 28.5427282 , lng:-81.3749294 },
-         zoom: 12
+         zoom: 12,
+         styles: styles,
+         mapTypeControl: false
        });
 
       const locations = [
