@@ -3,17 +3,71 @@ API Course, Lesson 1 -->
 <html>
  <head>
  <!-- styles put here, but you can include a CSS file and reference it instead! -->
-   <style type="text/css">
-     html, body { height: 100%; margin: 0; padding: 0; }
-     #map { height: 100%; }
-   </style>
+ <style>
+   html,
+   body {
+     font-family: Arial, sans-serif;
+     height: 100%;
+     margin: 0;
+     padding: 0;
+   }
+
+   .container {
+     height: 100%;
+     position: relative;
+   }
+
+   input {
+     font-size: 12px;
+   }
+
+   h1 {
+     color: #525454;
+     font-size: 22px;
+     margin: 0 0 10px 0;
+     text-align: center;
+   }
+
+   #hide-listings,
+   #show-listings {
+     width: 48%;
+   }
+
+   #map {
+     bottom:0px;
+     height: 100%;
+     left: 362px;
+     position: absolute;
+     right: 0px;
+   }
+
+   .options-box {
+     background: #fff;
+     border: 1px solid #999;
+     border-radius: 3px;
+     height: 100%;
+     line-height: 35px;
+     padding: 10px 10px 30px 10px;
+     text-align: left;
+     width: 340px;
+   }
+ </style>
  </head>
  <body>
-   <!-- TODO 1: Create a place to put the map in the HTML-->
-   <div id="map"></div>
+   <div class="container">
+     <div class="options-box">
+       <h1>Welcome to Sunny Orlando!</h1>
+       <div>
+         <input id="show-listings" type="button" value="Show Listings">
+         <input id="hide-listings" type="button" value="Hide Listings">
+       </div>
+     </div>
+     <div id="map"></div>
+   </div>
    <script>
      // TODO: Create a map variable
      let map;
+     let markers = [];
 
      // TODO: Complete the following function to initialize the map
      function initMap() {
@@ -21,22 +75,75 @@ API Course, Lesson 1 -->
          center: {lat: 28.5427282 , lng:-81.3749294 },
          zoom: 12
        });
-       // TODO: use a constructor to create a new map JS object. You can use the coordinates
-       // we used, 40.7413549, -73.99802439999996 or your own!
-       const ucf = {lat: 28.580463, lng: -81.250721};
-       const marker = new google.maps.Marker({
-         position: ucf,
-         map: map,
-         title: "My First Marker"
-       });
-       const infowindow = new google.maps.InfoWindow({
-         content: "InfoWindow, flowing through the wind..." +
-         " Shall we start over?"
-       })
-       marker.addListener('click', ()=> {
+
+      const locations = [
+        {title: "Walt Disney's Magic Kingdom",  location: {lat: 28.417663 , lng: -81.5834007}},
+        {title: "Bob Evans",  location: {lat: 28.3332783 , lng: -81.5850286}},
+        {title: "Universal Studios Florida",  location: {lat: 28.4731193 , lng: -81.4671166}},
+        {title: "Epcot Center",  location: {lat: 28.374694, lng: -81.5515927 }},
+        {title: "University of Central Florida",  location: {lat: 28.580463, lng: -81.250721}}
+      ]
+
+      let largeInfowindow = new google.maps.InfoWindow()
+
+      // The following group uses the location array to create an array of markers on initialize.
+      for (let i = 0; i < locations.length; i++) {
+        // Get the position from the location array.
+        let position = locations[i].location;
+        let title = locations[i].title;
+        // Create a marker per location, and put into markers array.
+        let marker = new google.maps.Marker({
+          map: map,
+          position: position,
+          title: title,
+          animation: google.maps.Animation.DROP,
+          id: i
+        });
+        // Push the marker to our array of markers.
+        markers.push(marker)
+        // Create an onclick event to open an infowindow at each marker.
+        marker.addListener('click', function() {
+          populateInfoWindow(this, largeInfowindow)
+        });
+      }
+      document.getElementById('show-listings').addEventListener('click', showListings);
+      document.getElementById('hide-listings').addEventListener('click', hideListings);
+    }//initMap()
+
+     // This function populates the infowindow when the marker is clicked. We'll only allow
+     // one infowindow which will open at the marker that is clicked, and populate based
+     // on that markers position.
+     function populateInfoWindow(marker, infowindow) {
+       // Check to make sure the infowindow is not already opened on this marker.
+       if (infowindow.marker != marker) {
+         infowindow.marker = marker
+         infowindow.setContent('<div>' + marker.title + '</div>')
          infowindow.open(map, marker)
-       })
-     }
+         // Make sure the marker property is cleared if the infowindow is closed.
+         infowindow.addListener('closeclick',function(){
+           infowindow.setMarker = null;
+         });
+       }
+     }//populateInfoWindow()
+
+     // This function will loop through the markers array and display them all.
+     function showListings() {
+       var bounds = new google.maps.LatLngBounds();
+       // Extend the boundaries of the map for each marker and display the marker
+       for (var i = 0; i < markers.length; i++) {
+         markers[i].setMap(map);
+         bounds.extend(markers[i].position);
+       }
+       map.fitBounds(bounds);
+     }//showListings()
+
+     // This function will loop through the listings and hide them all.
+     function hideListings() {
+       for (var i = 0; i < markers.length; i++) {
+         markers[i].setMap(null);
+       }
+     }//hideListings()
+
    </script>
 
    <script async defer
